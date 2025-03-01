@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Star Quest</title>
+  <title>Blast or Bless Game</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js" type="application/javascript"></script>
@@ -673,7 +673,7 @@
             const newLives = lives - 1;
             const tx = await contract.endGame(newStars, newLives);
             await tx.wait();
-            await loadUserData(); // Updates local stars and lives after transaction confirmation
+            await loadUserData();
             alert("Successfully sacrificed a life for 5 stars!");
           } catch (error) {
             console.error("Sacrifice Error:", error);
