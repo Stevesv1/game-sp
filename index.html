@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bomb Game</title>
+  <title>Star Quest</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js" type="application/javascript"></script>
@@ -266,6 +266,7 @@
       font-size: 1.5em;
       color: white;
     }
+
   </style>
 </head>
 <body>
@@ -298,7 +299,7 @@
     <button id="buy-lives-btn">Buy 5 Lives for 0.0005 ETH</button>
   </div>
   <div id="rules-modal" class="show" style="z-index: 1000;">
-    <h1>Game Rules</h1>
+    <h1>Star Quest Rules</h1>
     <ul>
       <li>▫️ Connect wallet with at least 0.1 Sepolia ETH</li>
       <li>▫️ Buy 5 lives for 0.0005 Sepolia ETH</li>
@@ -600,7 +601,7 @@
           cycleStars = 0;
 
           try {
-            await saveGameState(); // Send transaction to update stats in contract
+            await saveGameState();
             if (lives === 0) {
               showGameOver('no_lives');
             } else {
@@ -662,18 +663,29 @@
 
       document.getElementById('sacrifice-btn').addEventListener('click', async () => {
         if (isProcessing) return;
-        if (lives >= 1 && stars < 1) {
+        if (lives >= 1 && stars === 0) {
           const hasEnoughBalance = await checkBalance('sacrifice a life');
           if (!hasEnoughBalance) return;
-          lives -= 1;
-          stars += 5;
-          renderLives();
-          updateStarsDisplay(stars);
-          hasUnsavedChanges = true;
+          isProcessing = true;
+          document.getElementById('loading').classList.add('show');
+          try {
+            const newStars = stars + 5;
+            const newLives = lives - 1;
+            const tx = await contract.endGame(newStars, newLives);
+            await tx.wait();
+            await loadUserData(); // Updates local stars and lives after transaction confirmation
+            alert("Successfully sacrificed a life for 5 stars!");
+          } catch (error) {
+            console.error("Sacrifice Error:", error);
+            alert("Failed to sacrifice a life. Check the console for details.");
+          } finally {
+            isProcessing = false;
+            document.getElementById('loading').classList.remove('show');
+          }
         } else if (lives < 1) {
           alert("You have no lives left to sacrifice.");
         } else {
-          alert("You can only sacrifice a life when you have less than 1 star.");
+          alert("You can only sacrifice a life when you have 0 stars.");
         }
       });
 
