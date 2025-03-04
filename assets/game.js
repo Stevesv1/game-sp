@@ -23,11 +23,6 @@ const state = {
     currentFlipped: []
 };
 
-const isMobileDevice = () => {
-    const userAgent = navigator.userAgent.toLowerCase();
-    return /iphone|ipad|ipod|android|blackberry|windows phone|mobile/.test(userAgent);
-};
-
 const shuffle = array => {
     const clonedArray = [...array];
     for (let index = clonedArray.length - 1; index > 0; index--) {
@@ -52,7 +47,7 @@ const generateTweetText = () => {
     const moves = state.totalFlips;
     const time = state.totalTime;
     const gameLink = window.location.href;
-    return `I just completed Memory Game (made by @Zun2025) with ${moves} moves under ${time} secs\n\nTry it out this @sign themed game : ${gameLink}`;
+    return `I just completed Brain Train Game (made by @Zun2025) with ${moves} moves under ${time} secs\n\nTry it out this @sign themed game : ${gameLink}`;
 };
 
 const generateScorecardImage = () => {
@@ -220,11 +215,10 @@ const attachEventListeners = () => {
     });
 };
 
-if (!isMobileDevice()) {
+// Device detection and game initialization
+if (/Android|iPhone/i.test(navigator.userAgent)) {
+    document.body.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100vh;"><h1 style="color: white; text-align: center; font-family: \'Lexend\', sans-serif;">This game is supported only on PC or in desktop mode.</h1></div>';
+} else {
     generateGame();
     attachEventListeners();
-} else {
-    msg.style.display = "block";
-    msgText.innerHTML = "This game is only supported on PCs.";
-    document.querySelector('.controls').style.display = "none";
 }
