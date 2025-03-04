@@ -23,6 +23,11 @@ const state = {
     currentFlipped: []
 };
 
+const isMobileDevice = () => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    return /iphone|ipad|ipod|android|blackberry|windows phone|mobile/.test(userAgent);
+};
+
 const shuffle = array => {
     const clonedArray = [...array];
     for (let index = clonedArray.length - 1; index > 0; index--) {
@@ -56,27 +61,22 @@ const generateScorecardImage = () => {
     canvas.height = 300;
     const ctx = canvas.getContext('2d');
 
-    // Background
     ctx.fillStyle = '#FDF8E6';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Border
     ctx.strokeStyle = '#282A3A';
     ctx.lineWidth = 10;
     ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-    // Title
     ctx.fillStyle = '#282A3A';
     ctx.font = 'bold 40px Lexend';
     ctx.textAlign = 'center';
     ctx.fillText('Memory Game Scorecard', canvas.width / 2, 60);
 
-    // Score Details
     ctx.font = '30px Lexend';
     ctx.fillText(`Moves: ${state.totalFlips}`, canvas.width / 2, 140);
     ctx.fillText(`Time: ${state.totalTime} seconds`, canvas.width / 2, 200);
 
-    // Footer
     ctx.font = '20px Lexend';
     ctx.fillStyle = '#6f00fc';
     ctx.fillText('Made by @Zun2025', canvas.width / 2, 260);
@@ -220,5 +220,11 @@ const attachEventListeners = () => {
     });
 };
 
-generateGame();
-attachEventListeners();
+if (!isMobileDevice()) {
+    generateGame();
+    attachEventListeners();
+} else {
+    msg.style.display = "block";
+    msgText.innerHTML = "This game is only supported on PCs.";
+    document.querySelector('.controls').style.display = "none";
+}
