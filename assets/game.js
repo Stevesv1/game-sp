@@ -19,7 +19,8 @@ const state = {
     flippedCards: 0,
     totalFlips: 0,
     totalTime: 0,
-    loop: null
+    loop: null,
+    currentFlipped: []
 };
 
 const shuffle = array => {
@@ -42,6 +43,47 @@ const pickRandom = (array, items) => {
     return randomPicks;
 };
 
+const generateTweetText = () => {
+    const moves = state.totalFlips;
+    const time = state.totalTime;
+    const gameLink = window.location.href;
+    return `I just completed Memory Game (made by @Zun2025) with ${moves} moves under ${time} secs\n\nTry it out this @sign themed game : ${gameLink}`;
+};
+
+const generateScorecardImage = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 600;
+    canvas.height = 300;
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#FDF8E6';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Border
+    ctx.strokeStyle = '#282A3A';
+    ctx.lineWidth = 10;
+    ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+    // Title
+    ctx.fillStyle = '#282A3A';
+    ctx.font = 'bold 40px Lexend';
+    ctx.textAlign = 'center';
+    ctx.fillText('Memory Game Scorecard', canvas.width / 2, 60);
+
+    // Score Details
+    ctx.font = '30px Lexend';
+    ctx.fillText(`Moves: ${state.totalFlips}`, canvas.width / 2, 140);
+    ctx.fillText(`Time: ${state.totalTime} seconds`, canvas.width / 2, 200);
+
+    // Footer
+    ctx.font = '20px Lexend';
+    ctx.fillStyle = '#6f00fc';
+    ctx.fillText('Made by @Zun2025', canvas.width / 2, 260);
+
+    return canvas.toDataURL('image/png');
+};
+
 const generateGame = () => {
     const dimensions = selectors.board.getAttribute('data-dimension');
     if (dimensions % 2 !== 0) {
@@ -58,7 +100,7 @@ const generateGame = () => {
         'assets/images/image7.jpg',
         'assets/images/image8.jpg',
         'assets/images/image9.jpg',
-        'assets/images/image10.jpg'
+        'assets/images/image10.png'
     ];
     const picks = pickRandom(images, (dimensions * dimensions) / 2);
     const items = shuffle([...picks, ...picks]);
@@ -83,7 +125,7 @@ const startGame = () => {
     startBtn.classList.add("lock");
     startBtn.innerText = "Started";
     msg.style.display = "block";
-    msgText.innerHTML = `Game has been Started`;
+    msgText.innerHTML = `Game Started`;
 
     setTimeout(() => {
         msg.style.display = "none";
@@ -97,14 +139,13 @@ const startGame = () => {
 };
 
 const flipBackCards = () => {
-    const cardsToFlipBack = document.querySelectorAll('.card.flipped:not(.matched)');
-    if (cardsToFlipBack.length > 0) {
+    const unmatchedCards = state.currentFlipped.filter(card => !card.classList.contains('matched'));
+    if (unmatchedCards.length > 0) {
         document.getElementById('noMatchSound').play();
+        unmatchedCards.forEach(card => card.classList.remove('flipped'));
     }
-    cardsToFlipBack.forEach(card => {
-        card.classList.remove('flipped');
-    });
     state.flippedCards = 0;
+    state.currentFlipped = [];
 };
 
 const flipCard = card => {
@@ -117,13 +158,14 @@ const flipCard = card => {
 
     if (state.flippedCards <= 2) {
         card.classList.add('flipped');
+        state.currentFlipped.push(card);
     }
 
     if (state.flippedCards === 2) {
-        const flippedCards = document.querySelectorAll('.flipped:not(.matched)');
-        if (flippedCards[0].querySelector('.card-back img').src === flippedCards[1].querySelector('.card-back img').src) {
-            flippedCards[0].classList.add('matched');
-            flippedCards[1].classList.add('matched');
+        const [card1, card2] = state.currentFlipped;
+        if (card1.querySelector('.card-back img').src === card2.querySelector('.card-back img').src) {
+            card1.classList.add('matched');
+            card2.classList.add('matched');
             document.getElementById('matchSound').play();
         }
 
@@ -134,13 +176,11 @@ const flipCard = card => {
 
     if (!document.querySelectorAll('.card:not(.flipped)').length) {
         setTimeout(() => {
+            const scorecardImg = generateScorecardImage();
             selectors.boardContainer.classList.add('flipped');
             selectors.win.innerHTML = `
-                <span class="win-text">
-                    You won!<br />
-                    with <span class="highlight">${state.totalFlips}</span> moves<br />
-                    under <span class="highlight">${state.totalTime}</span> seconds
-                </span>
+                <img src="${scorecardImg}" alt="Scorecard" class="scorecard-img">
+                <button id="shareBtn">Share on X</button>
             `;
             startBtn.classList.remove("lock");
             startBtn.style.color = "white";
@@ -153,16 +193,18 @@ const flipCard = card => {
 
 const attachEventListeners = () => {
     document.addEventListener('click', event => {
-        const eventTarget = event.target;
-        const eventParent = eventTarget.parentElement;
-
-        if (eventTarget.className.includes('card') && !eventParent.className.includes('flipped')) {
-            flipCard(eventParent);
-        } else if (eventTarget.nodeName === 'BUTTON' && !eventTarget.className.includes('disabled')) {
-            if (eventTarget.id === 'btn') {
+        const card = event.target.closest('.card');
+        if (card && !card.classList.contains('flipped')) {
+            flipCard(card);
+        } else if (event.target.nodeName === 'BUTTON' && !event.target.className.includes('disabled')) {
+            if (event.target.id === 'btn') {
                 startGame();
-            } else if (eventTarget.id === 'rulesBtn') {
+            } else if (event.target.id === 'rulesBtn') {
                 rulesPopup.style.display = 'block';
+            } else if (event.target.id === 'shareBtn') {
+                const tweetText = generateTweetText();
+                const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+                window.open(tweetUrl, '_blank');
             }
         }
     });
