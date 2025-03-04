@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Memory Game</title>
+
+        <!-- Include Lexend font from Google Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="assets/styles.css" />
+        <script src="assets/game.js" defer></script>
+    </head>
+    <body>
+        <div id="msgArea" class="msg"><p class="msgText"></p></div>
+
+        <div class="game">
+            <div class="controls">
+                <button id="btn" class="">Start</button>
+                <button id="rulesBtn" class="">Rules</button>
+                <div class="stats">
+                    <div class="moves">0 moves</div>
+                    <div class="timer">time: 0 sec</div>
+                </div>
+            </div>
+            <div class="board-container">
+                <div class="board" data-dimension="4"></div>
+                <div class="win">You won!</div>
+            </div>
+            <div class="footer">
+                <p>Made with love by <a href="https://x.com/Zun2025" target="_blank">Zun</a></p>
+            </div>
+        </div>
+
+        <!-- Rules Popup -->
+        <div id="rulesPopup" class="popup">
+            <div class="popup-content">
+                <span class="close">&times;</span>
+                <h2>Game Rules</h2>
+                <p>
+                    Flip two cards at a time to find matching pairs. If the images match, they stay flipped. If not, they flip back. The game ends when all pairs are matched. Good luck!
+                </p>
+            </div>
+        </div>
+
+        <!-- Audio Elements for Sound Effects -->
+        <audio id="matchSound" src="assets/sounds/right.mp3"></audio>
+        <audio id="noMatchSound" src="assets/sounds/wrong.mp3"></audio>
+    </body>
+</html>
