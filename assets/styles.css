@@ -5,26 +5,8 @@ html {
     font-family: 'Lexend', sans-serif;
 }
 
-.msg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10;
-    display: none;
-    background-color: #282A3A;
-    border-radius: 5px;
-    padding: 15px;
-    box-shadow: 1px 1px 15px 2px rgb(111, 111, 111);
-}
-
-.msg p {
-    display: flex;
-    padding: 0 10px;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    color: white;
+body {
+    overflow: hidden;
 }
 
 .game {
@@ -36,11 +18,15 @@ html {
 
 .controls {
     display: flex;
-    gap: 20px;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
     margin-bottom: 20px;
 }
 
-button {
+#rulesBtn {
+    flex: 1;
+    margin-right: 10px;
     background: #282A3A;
     color: #FFF;
     border-radius: 5px;
@@ -53,32 +39,21 @@ button {
     transition: all 0.5s;
 }
 
-button:hover {
+#rulesBtn:hover {
     color: #ed977c;
     background-color: #3e415a;
 }
 
-button.lock {
-    pointer-events: none;
-    background-color: #4d4c4c;
-}
-
-.disabled {
-    color: #757575;
-}
-
 .stats {
+    flex: 2;
+    display: flex;
+    justify-content: space-around;
     color: #FFF;
     font-size: 14pt;
     border: 1px dotted floralwhite;
     padding: 10px;
-    width: 100%;
-    box-shadow: 5px 3px 15px 1px darkblue;
     border-radius: 7px;
-}
-
-.stats .moves, .timer {
-    color: #ffffff;
+    box-shadow: 5px 3px 15px 1px darkblue;
 }
 
 .board-container {
@@ -161,8 +136,16 @@ button.lock {
     padding: 20px;
 }
 
-#shareBtn {
+#shareBtn, #replayBtn {
     font-size: 16pt;
+    background: #282A3A;
+    color: #FFF;
+    border-radius: 5px;
+    padding: 10px 20px;
+    border: 0;
+    cursor: pointer;
+    font-family: 'Lexend', sans-serif;
+    margin: 10px;
 }
 
 .popup {
@@ -206,6 +189,27 @@ button.lock {
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+.error-message {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(325deg, #6f00fc 0%, #fc7900 50%, #fcc500b9 100%);
+    z-index: 1000;
+}
+
+.error-message h1 {
+    color: white;
+    text-align: center;
+    font-family: 'Lexend', sans-serif;
+    font-size: 24px;
+    padding: 20px;
 }
 
 @media (max-width: 700px) {
