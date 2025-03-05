@@ -3,13 +3,9 @@ const selectors = {
     board: document.querySelector('.board'),
     moves: document.querySelector('.moves'),
     timer: document.querySelector('.timer'),
-    start: document.querySelector('#btn'),
     win: document.querySelector('.win')
 };
 
-let msg = document.querySelector('.msg');
-let msgText = document.querySelector('.msg p');
-let startBtn = document.querySelector('#btn');
 let rulesBtn = document.getElementById('rulesBtn');
 let rulesPopup = document.getElementById('rulesPopup');
 let closeBtn = rulesPopup.querySelector('.close');
@@ -66,7 +62,7 @@ const generateScorecardImage = () => {
     ctx.fillStyle = '#282A3A';
     ctx.font = 'bold 40px Lexend';
     ctx.textAlign = 'center';
-    ctx.fillText('Memory Game Scorecard', canvas.width / 2, 60);
+    ctx.fillText('Brain Train Scorecard', canvas.width / 2, 60);
 
     ctx.font = '30px Lexend';
     ctx.fillText(`Moves: ${state.totalFlips}`, canvas.width / 2, 140);
@@ -116,19 +112,8 @@ const generateGame = () => {
 
 const startGame = () => {
     state.gameStarted = true;
-    selectors.start.classList.add('disabled');
-    startBtn.classList.add("lock");
-    startBtn.innerText = "Started";
-    msg.style.display = "block";
-    msgText.innerHTML = `Game Started`;
-
-    setTimeout(() => {
-        msg.style.display = "none";
-    }, 1500);
-
     state.loop = setInterval(() => {
         state.totalTime++;
-        selectors.moves.innerText = `${state.totalFlips} moves`;
         selectors.timer.innerText = `time: ${state.totalTime} sec`;
     }, 1000);
 };
@@ -146,6 +131,7 @@ const flipBackCards = () => {
 const flipCard = card => {
     state.flippedCards++;
     state.totalFlips++;
+    selectors.moves.innerText = `${state.totalFlips} moves`;
 
     if (!state.gameStarted) {
         startGame();
@@ -175,12 +161,11 @@ const flipCard = card => {
             selectors.boardContainer.classList.add('flipped');
             selectors.win.innerHTML = `
                 <img src="${scorecardImg}" alt="Scorecard" class="scorecard-img">
-                <button id="shareBtn">Share on X</button>
+                <div style="display: flex; justify-content: center; gap: 20px;">
+                    <button id="replayBtn">Replay</button>
+                    <button id="shareBtn">Share on X</button>
+                </div>
             `;
-            startBtn.classList.remove("lock");
-            startBtn.style.color = "white";
-            startBtn.innerText = "Replay";
-            startBtn.addEventListener("click", () => window.location.reload());
             clearInterval(state.loop);
         }, 1000);
     }
@@ -191,16 +176,14 @@ const attachEventListeners = () => {
         const card = event.target.closest('.card');
         if (card && !card.classList.contains('flipped')) {
             flipCard(card);
-        } else if (event.target.nodeName === 'BUTTON' && !event.target.className.includes('disabled')) {
-            if (event.target.id === 'btn') {
-                startGame();
-            } else if (event.target.id === 'rulesBtn') {
-                rulesPopup.style.display = 'block';
-            } else if (event.target.id === 'shareBtn') {
-                const tweetText = generateTweetText();
-                const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
-                window.open(tweetUrl, '_blank');
-            }
+        } else if (event.target.id === 'rulesBtn') {
+            rulesPopup.style.display = 'block';
+        } else if (event.target.id === 'replayBtn') {
+            window.location.reload();
+        } else if (event.target.id === 'shareBtn') {
+            const tweetText = generateTweetText();
+            const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+            window.open(tweetUrl, '_blank');
         }
     });
 
@@ -215,9 +198,8 @@ const attachEventListeners = () => {
     });
 };
 
-// Device detection and game initialization
 if (/Android|iPhone/i.test(navigator.userAgent)) {
-    document.body.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100vh;"><h1 style="color: white; text-align: center; font-family: \'Lexend\', sans-serif;">This game is supported only on PC or in desktop mode.</h1></div>';
+    document.body.innerHTML = '<div class="error-message"><h1>This game is supported only on PC or in desktop mode.</h1></div>';
 } else {
     generateGame();
     attachEventListeners();
